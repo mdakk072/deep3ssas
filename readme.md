@@ -32,6 +32,8 @@ This project aims to create a parking spot detection and management system that 
 
 
 
+
+
 ## DevOps Implementation
 
 To implement a DevOps approach for this project, we will use the following tools and methodologies:
