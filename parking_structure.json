@@ -1,0 +1,116 @@
+{
+    "1": {
+    "id": 1,
+    "source": "http://www.insecam.org/en/view/804453/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "2": {
+    "id": 2,
+    "source": "http://www.insecam.org/en/view/879592/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "3": {
+    "id": 3,
+    "source": "http://www.insecam.org/en/view/945438/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "4": {
+    "id": 4,
+    "source": "http://www.insecam.org/en/view/996923/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "5": {
+    "id": 5,
+    "source": "http://www.insecam.org/en/view/889387/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "6": {
+    "id": 6,
+    "source": "http://www.insecam.org/en/view/1001826/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "7": {
+    "id": 7,
+    "source": "http://www.insecam.org/en/view/689812/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "8": {
+    "id": 8,
+    "source": "http://www.insecam.org/en/view/878868/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "9": {
+    "id": 9,
+    "source": "http://www.insecam.org/en/view/568282/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "10": {
+    "id": 10,
+    "source": "http://www.insecam.org/en/view/812272/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    "11": {
+    "id": 11,
+    "source": "http://www.insecam.org/en/view/447263/",
+    "detections": {},
+    "image": null,
+    "freespace": 0,
+    "sourceInfos": null
+    },
+    
+    "12": {
+        "id": 12,
+        "source": "http://www.insecam.org/en/view/635627/",
+        "detections": {},
+        "image": null,
+        "freespace": 0,
+        "sourceInfos": null
+        },
+        "13": {
+        "id": 13,
+        "source": "http://www.insecam.org/en/view/867608/",
+        "detections": {},
+        "image": null,
+        "freespace": 0,
+        "sourceInfos": null
+        },
+        "14": {
+        "id": 14,
+        "source": "http://www.insecam.org/en/view/889385/",
+        "detections": {},
+        "image": null,
+        "freespace": 0,
+        "sourceInfos": null
+        }
+        
+        }
