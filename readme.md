@@ -5,6 +5,7 @@ This project aims to create a parking spot detection and management system that 
 ## Overview
 
 1. **Python Flask Website**: A web application that displays available parking spots in different locations using Flask and Jinja2.
+
 2. **Detection Module**: 
 
 A Python-based module using YOLOv5 to process live camera feeds and detect parking spots.
@@ -23,13 +24,14 @@ A Python-based module using YOLOv5 to process live camera feeds and detect parki
 7. **Web Application**: Display the available parking spot information on a Flask web application for users.
 ## Modules, Attributes, and Methods
 
-| Module          | Attributes          | Methods                |
-|-----------------|---------------------|------------------------|
-| DetectionModule | - detection_model   | - detect_parking_spots() |
-| DataCollection  | - collected_data<br/>- database_connection | - collect_data()<br/>- save_data() |
-| DataCorrection  | - raw_data<br/>- corrected_data | - correct_data() |
-| ModelTraining   | - training_data<br/>- evaluation_data | - train_model()<br/>- evaluate_model() |
-| WebApplication  | - flask_app<br/>- api_endpoint | - display_data() |
+| Module          | Attributes                                                   | Methods                             |
+|-----------------|--------------------------------------------------------------|-------------------------------------|
+| DetectionModule | - detection_model<br/>- cap<br/>- fps_start<br/>- frame_count<br/>- colorStates<br/>- strStates<br/>- readyToSend<br/>- proccess<br/>- frameTosend<br/>- parkings<br/>- parkingsSendCopy<br/>- currentParkingID | - __init__()<br/>- getLocalisation()<br/>- prepare_parkings_data()<br/>- update_API()<br/>- detect_parking_spots()<br/>- get_remote_image()<br/>- runRemoteSource() |
+| DataCollection  | - collected_data<br/>- database_connection                    | - collect_data()<br/>- save_data() |
+| DataCorrection  | - raw_data<br/>- corrected_data                               | - correct_data()                   |
+| ModelTraining   | - training_data<br/>- evaluation_data                         | - train_model()<br/>- evaluate_model() |
+| WebApplication  | - flask_app<br/>- api_endpoint                                | - display_data()                   |
+
 
 
 
