@@ -8,7 +8,35 @@ This project aims to create a parking spot detection and management system that 
 
 2. **Detection Module**: 
 
-A Python-based module using YOLOv5 to process live camera feeds and detect parking spots.
+The Detection Module is a Python-based module that utilizes the YOLOv5 object detection model to process live camera feeds and detect parking spots. It is implemented in the `ParkingLotDetector` class, which includes the following attributes and methods:
+
+**Attributes:**
+
+- `detection_model`: The YOLOv5 object detection model.
+- `cap`: VideoCapture object to capture video from camera or video file.
+- `fps_start`: Tick count to measure the frame rate.
+- `frame_count`: Number of processed frames.
+- `colorStates`: Tuple of colors used to visualize the parking spot states.
+- `strStates`: Tuple of string labels representing parking spot states.
+- `readyToSend`: Flag indicating if the data is ready to be sent to the API.
+- `proccess`: Flag indicating if the module should continue processing.
+- `frameTosend`: The frame to be sent to the API.
+- `parkings`: Dictionary containing information about the parking spots.
+- `parkingsSendCopy`: A copy of the parking spots dictionary for sending to the API.
+- `currentParkingID`: The ID of the current parking spot being processed.
+
+**Methods:**
+
+- `__init__`: Initializes the ParkingLotDetector with the specified model, video source, and camera settings.
+- `getLocalisation`: Retrieves the geolocation information of the user.
+- `prepare_parkings_data`: Prepares the parking spots data to be sent to the API.
+- `update_API`: Sends the parking spots data to the API.
+- `detect_frame`: Detects parking spots in a video frame.
+- `get_remote_image`: Retrieves an image from a remote web source.
+- `runRemoteSource`: Main loop that processes the remote video feed and detects parking spots.
+
+This module is responsible for detecting parking spots in real-time by analyzing video frames from live camera feeds or video files. It processes each frame, identifies the parking spots, and sends the updated parking spot data to a web API for further analysis or display.
+
 
 3. **Data Collection Module**: Collects data from the detection module and saves it in a PostgreSQL database.
 4. **Data Correction Module**: Corrects the collected data and prepares it for model training.
