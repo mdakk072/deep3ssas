@@ -28,7 +28,7 @@ class NumpyEncoder(json.JSONEncoder):
 # Log the start of the program
 #logging.info('Program started.')
 
-class ParkingLotDetector:
+class DetectionModule:
     def __init__(self, model_path='best.pt', video_path='test.mp4', camera=False, cameraid=0):
         self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
         if camera:
@@ -195,5 +195,5 @@ class ParkingLotDetector:
                 cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-        p=ParkingLotDetector(model_path='best.pt', camera=False, cameraid=1)
+        p=DetectionModule(model_path='best.pt', camera=False, cameraid=1)
         p.runRemoteSource()
