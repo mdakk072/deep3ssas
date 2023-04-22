@@ -5,14 +5,17 @@ This project aims to create a parking spot detection and management system that 
 ## Overview
 
 1. **Python Flask Website**: A web application that displays available parking spots in different locations using Flask and Jinja2.
-2. **Detection Module**: A Python-based module using YOLOv5 to process live camera feeds and detect parking spots.
+2. **Detection Module**: 
+
+A Python-based module using YOLOv5 to process live camera feeds and detect parking spots.
+
 3. **Data Collection Module**: Collects data from the detection module and saves it in a PostgreSQL database.
 4. **Data Correction Module**: Corrects the collected data and prepares it for model training.
 5. **Training and Evaluation Module**: Trains the model using the corrected data and evaluates its performance. If the new model performs better, it is sent to production.
 ## Parking Detection Project Workflow
 
 1. **Camera Feed**: Obtain live camera feed from various parking locations.
-2. **Detection Module**: Process the camera feed using YOLOv5 to detect available parking spots.
+2. **Detection Module**: 2. **Detection Module**: Process the camera feed using YOLOv5 to detect available parking spots.
 3. **Data Collection**: Collect the detected parking spot information and save it to the PostgreSQL database.
 4. **Data Correction**: Correct the collected data, if necessary, to improve the accuracy of the information.
 5. **Model Training**: Train the YOLOv5 model using the corrected data to improve detection accuracy.
@@ -22,7 +25,6 @@ This project aims to create a parking spot detection and management system that 
 
 | Module          | Attributes          | Methods                |
 |-----------------|---------------------|------------------------|
-| Camera          | - camera_feed       | - get_feed()           |
 | DetectionModule | - detection_model   | - detect_parking_spots() |
 | DataCollection  | - collected_data<br/>- database_connection | - collect_data()<br/>- save_data() |
 | DataCorrection  | - raw_data<br/>- corrected_data | - correct_data() |
