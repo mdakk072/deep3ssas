@@ -38,9 +38,36 @@ The Detection Module is a Python-based module that utilizes the YOLOv5 object de
 This module is responsible for detecting parking spots in real-time by analyzing video frames from live camera feeds or video files. It processes each frame, identifies the parking spots, and sends the updated parking spot data to a web API for further analysis or display.
 
 
-3. **Data Collection Module**: Collects data from the detection module and saves it in a PostgreSQL database.
-4. **Data Correction Module**: Corrects the collected data and prepares it for model training.
-5. **Training and Evaluation Module**: Trains the model using the corrected data and evaluates its performance. If the new model performs better, it is sent to production.
+3. **Correction Module**: 
+
+The Correction Module is a Python-based module that corrects the detected parking spots by comparing them to the ground truth annotations. It is implemented in the `CorrectionModule` class, which includes the following attributes and methods:
+
+**Attributes:**
+
+- `images_dir`: The directory containing the input images.
+- `annotations_dir`: The directory containing the ground truth annotations.
+- `labels_dir`: The directory containing the labels (detected parking spots).
+- `max_width`: The maximum width of the images.
+- `max_height`: The maximum height of the images.
+
+**Methods:**
+
+- `__init__`: Initializes the CorrectionModule with the specified directories and image dimensions.
+- `iou`: Calculates the Intersection over Union (IoU) between two bounding boxes.
+- `distance`: Calculates the Euclidean distance between the centers of two bounding boxes.
+- `inclusion_percentage`: Calculates the percentage of one bounding box included in another.
+- `max_touching_distance`: Calculates the maximum distance between the centers of two touching bounding boxes.
+- `analyze_boxes`: Analyzes two bounding boxes and returns a dictionary with the analysis results.
+- `load_image`: Loads an image from a given path.
+- `load_images`: Loads all images for a specific camera ID.
+- `load_annotations`: Loads ground truth annotations for a specific camera ID.
+- `load_labels`: Loads labels (detected parking spots) for a given image name.
+- `compare_correction`: Compares the detected parking spots to the ground truth annotations and returns matched and unmatched predictions.
+- `convert_to_yolo_format`: Converts corrected parking spot coordinates to YOLO format and saves them to a label file.
+- `run_analysis`: Runs the correction analysis for a specific camera ID and saves the corrected results.
+
+The Correction Module helps improve the accuracy of the parking spot detection by comparing the detected parking spots to the ground truth annotations. It calculates various metrics such as IoU, distance, and inclusion percentage to determine if a prediction is correct or not. The corrected parking spot coordinates are then converted to YOLO format and saved to label files for further use.
+4. **Training and Evaluation Module**: Trains the model using the corrected data and evaluates its performance. If the new model performs better, it is sent to production.
 ## Parking Detection Project Workflow
 
 1. **Camera Feed**: Obtain live camera feed from various parking locations.
