@@ -1,16 +1,13 @@
-name: Test on PR merged
+name: Test on push to dev
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - dev
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
 
     steps:
     - name: Check out repository
@@ -19,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.11
+        python-version: 3.x
 
     - name: Install dependencies
       run: |
