@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - dev
-
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
 jobs:
   test:
     runs-on: ubuntu-latest
