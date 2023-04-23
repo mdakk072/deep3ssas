@@ -82,10 +82,10 @@ The Correction Module helps improve the accuracy of the parking spot detection b
 | Module          | Attributes                                                   | Methods                             |
 |-----------------|--------------------------------------------------------------|-------------------------------------|
 | DetectionModule | - detection_model<br/>- cap<br/>- fps_start<br/>- frame_count<br/>- colorStates<br/>- strStates<br/>- readyToSend<br/>- proccess<br/>- frameTosend<br/>- parkings<br/>- parkingsSendCopy<br/>- currentParkingID | - __init__()<br/>- getLocalisation()<br/>- prepare_parkings_data()<br/>- update_API()<br/>- detect_parking_spots()<br/>- get_remote_image()<br/>- runRemoteSource() |
-| DataCollection  | - collected_data<br/>- database_connection                    | - collect_data()<br/>- save_data() |
-| DataCorrection  | - raw_data<br/>- corrected_data                               | - correct_data()                   |
+| CorrectionModule | - images_dir<br/>- annotations_dir<br/>- labels_dir<br/>- max_width<br/>- max_height | - __init__()<br/>- iou()<br/>- distance()<br/>- inclusion_percentage()<br/>- max_touching_distance()<br/>- analyze_boxes()<br/>- load_image()<br/>- load_images()<br/>- load_annotations()<br/>- load_labels()<br/>- compare_correction()<br/>- convert_to_yolo_format()<br/>- run_analysis() |
 | ModelTraining   | - training_data<br/>- evaluation_data                         | - train_model()<br/>- evaluate_model() |
 | WebApplication  | - flask_app<br/>- api_endpoint                                | - display_data()                   |
+
 
 
 
@@ -99,12 +99,20 @@ To implement a DevOps approach for this project, we will use the following tools
 
 ### 1. Version Control (Git & GitHub Actions)
 
-- Use Git for version control and collaboration.
-- Use GitHub as the remote repository and leverage GitHub Actions for CI/CD.
+In this project, we use Git as our version control system to manage code changes, track progress, and collaborate more effectively. Git enables us to create branches for various purposes, including feature development, bug fixes, and stable releases. It also allows us to manage and review the code changes more efficiently.
+
+We use GitHub as our remote repository platform, which provides a user-friendly interface for managing Git repositories and collaborating with team members. GitHub also offers GitHub Actions, a powerful automation tool that we can leverage for Continuous Integration (CI) and Continuous Deployment (CD).
+
+With GitHub Actions, we can automatically run tests, code analysis, and deployment scripts for each push or merge to the `dev` branch. This ensures that new code is thoroughly tested and integrated with the existing codebase, and that the latest version of the application is always available to users.
 
 ### 2. Configuration Management (YANG, YAML, XML, Ansible, Chef)
 
-- Use YAML for most configuration files (e.g., Ansible playbooks, GitHub Actions workflows).
+For this project, we choose to use YAML (YAML Ain't Markup Language) for most configuration files due to its simplicity, readability, and support for data structures like lists, dictionaries, and scalars. Examples of YAML usage in this project include Ansible playbooks and GitHub Actions workflows.
+
+YAML is a human-readable data serialization format that is easy to understand and maintain. Its simplicity makes it well-suited for configuration management tasks, as it integrates well with popular configuration management tools such as Ansible and Chef.
+
+Using YAML for configuration files ensures that our project remains organized and easy to manage, making it an ideal choice for our DevOps implementation.
+
 - Use XML if you have specific requirements for XML-based configurations.
 - Use Ansible and Chef for configuration management and infrastructure provisioning.
 
