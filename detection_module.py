@@ -206,7 +206,7 @@ class DetectionModule:
                 self.readyToSend = -1
                 break
             except Exception as e:
-                print("> !An exception occurred: {}".format(e))
+                print(">! An exception occurred: {}".format(e))
                 self.readyToSend = -1
                 self.cap.release()
                 cv2.destroyAllWindows()
