@@ -1,5 +1,5 @@
 # Utiliser une image de base Python
-FROM python:3.8
+FROM ultralytics/yolov5:latest-cpu
 # Définir le répertoire de travail
 WORKDIR /app
 # Copier les fichiers de configuration et d'installation
@@ -13,4 +13,4 @@ COPY . .
 # Exposer le port 5000 pour l'application Flask
 EXPOSE 5000
 # Lancer l'application
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]

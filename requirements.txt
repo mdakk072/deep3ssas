@@ -18,3 +18,4 @@ pandas>=1.1.4
 seaborn>=0.11.0
 bs4
 flask
+gunicorn

@@ -2,7 +2,8 @@ import json
 from flask import Flask, jsonify, request
 from detection_module import DetectionModule,NumpyEncoder
 import threading
-
+import argparse
+import os
 app = Flask(__name__)
 # Initialiser le module de détection
 detection_module = DetectionModule()
@@ -43,5 +44,23 @@ def get_detection_module_info():
     }
     return jsonify(module_info)
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', type=str, default='0.0.0.0', help='The host to bind to')
+    parser.add_argument('--port', type=int, default=5000, help='The port to listen on')
+    parser.add_argument('--mode', type=str, default='production', help='Run mode: development or production')
+    args = parser.parse_args()
+    port = int(os.environ.get('WEBSITE_PORT', args.port))
+
+    if args.mode == 'development':
+        app.config['ENV'] = 'development'
+        app.config['DEBUG'] = True
+    else:
+        app.config['ENV'] = 'production'
+        app.config['DEBUG'] = False
+
+    app.run(host=args.host, port=port)
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    main()
