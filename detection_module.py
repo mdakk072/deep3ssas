@@ -174,7 +174,7 @@ class DetectionModule:
                     print(f'========== Parking {p}/{len(self.parkings)} ==========')
                     self.currentParkingID = p
                     parking = self.parkings[p]
-                    if not self.currentParkingID:
+                    if not self.currentParkingID and self.cap!=None:
                         ret , frame = self.cap.read()
                     else:
                         print(f'>Getting remote Parking ID {p} from source: {parking["source"]}')
@@ -187,10 +187,7 @@ class DetectionModule:
                     print('Detect OK!')
                     self.frame_count += 1
                     if self.test:continue
-                    cv2.imshow('Processed Frame with Detections', parking['image'])
                     print(parking['detections'])
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
                     time.sleep(1)
                 print(f'>Check API ... ')
                 if self.readyToSend:
@@ -208,8 +205,8 @@ class DetectionModule:
             except Exception as e:
                 print(">! An exception occurred: {}".format(e))
                 self.readyToSend = -1
-                self.cap.release()
-                cv2.destroyAllWindows()
+                if  self.cap!=None:
+                 self.cap.release()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Detection Module")
