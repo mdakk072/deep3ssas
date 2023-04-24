@@ -62,7 +62,6 @@ class DetectionModule:
             url = f'http://ip-api.com/json/{ip_address}'
             response = requests.get(url)
             response.raise_for_status()  # Raise an exception if the status code is not 200
-
             location = response.json()
             location_keys = ['country', 'city', 'lat', 'lon', 'regionName', 'timezone', 'zip', 'countryCode']
             locationInfos = {key: location.get(key, f'None ({key} Error)') for key in location_keys}
@@ -97,8 +96,8 @@ class DetectionModule:
                     try:
                         r = requests.post(link2, data=json_response, headers={'Content-Type': 'application/json'})
                         self.proccess=True
-                        print(r)
-                        print('data sent !')
+                        #print(r)
+                        #print('data sent !')
                         return r
                     except Exception as e:
                         #logging.error('Error occurred while sending data to API: {}'.format(e))
@@ -171,33 +170,41 @@ class DetectionModule:
                 elapsed_time = current_time - start_time
                 for idx, p in enumerate(self.parkings, start=1):
                     time.sleep(0.05)
-                    print(f'========== Parking {p}/{len(self.parkings)} ==========')
+                    #print(f'========== Parking {p}/{len(self.parkings)} ==========')
                     self.currentParkingID = p
                     parking = self.parkings[p]
-                    if not self.currentParkingID and self.cap!=None:
-                        ret , frame = self.cap.read()
+                    if not self.currentParkingID and self.cap != None:
+                        ret, frame = self.cap.read()
                     else:
-                        print(f'>Getting remote Parking ID {p} from source: {parking["source"]}')
+                        #print(f'>Getting remote Parking ID {p} from source: {parking["source"]}')
                         try:
                             frame = self.get_remote_image()
-                        except:
+                        except Exception as e:
+                            print(f">! Failed to get remote image: {e}")
                             continue
-                    print('>Detecting parking spaces in the frame.')
-                    parking['image'], parking['detections'] = self.detect_frame(frame)
-                    print('Detect OK!')
+                    #print('>Detecting parking spaces in the frame.')
+                    try:
+                        parking['image'], parking['detections'] = self.detect_frame(frame)
+                        #print('Detect OK!')
+                    except Exception as e:
+                        print(f">! Failed to detect parking spaces: {e}")
+                        continue
                     self.frame_count += 1
-                    if self.test:continue
-                    print(parking['detections'])
+                    if self.test:
+                        continue
+                    #print(parking['detections'])
                     time.sleep(1)
-                print(f'>Check API ... ')
+                #print(f'>Check API ... ')
                 if self.readyToSend:
-                    print('Preparing parkings data to be sent to the API.')
+                    #print('Preparing parkings data to be sent to the API.')
                     self.parkingsSendCopy = self.prepare_parkings_data(self.parkings)
-                    self.update_API(self.parkingsSendCopy)
-                else:
-                    print(f'>{elapsed_time}s...')
+                    try:
+                        self.update_API(self.parkingsSendCopy)
+                    except Exception as e:
+                        print(f">! Failed to update API: {e}")
+                        continue
                 start_time = current_time
-                if self.test  :
+                if self.test:
                     break
             except KeyboardInterrupt:
                 self.readyToSend = -1
@@ -205,9 +212,9 @@ class DetectionModule:
             except Exception as e:
                 print(">! An exception occurred: {}".format(e))
                 self.readyToSend = -1
-                if  self.cap!=None:
-                 self.cap.release()
-
+                if self.cap != None:
+                    self.cap.release()
+''''''
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Detection Module")
     parser.add_argument('--model', type=str, default='best.pt', help="Chemin vers le fichier de modèle.")
@@ -216,5 +223,5 @@ if __name__ == "__main__":
     parser.add_argument('--cameraid', type=int, default=1, help="ID de la caméra à utiliser.")
     parser.add_argument('--test', action='store_true', help="Mode test, arrête la boucle principale après un cycle.")  
     args = parser.parse_args()
-    p = DetectionModule(model_path=args.model, video_path=args.video, camera=args.camera, cameraid=args.cameraid, test=args.test)
-    p.runRemoteSource()
+    # p = DetectionModule(model_path=args.model, video_path=args.video, camera=args.camera, cameraid=args.cameraid, test=args.test)
+    # p.runRemoteSource()
