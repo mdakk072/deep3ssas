@@ -47,7 +47,7 @@ def get_detection_module_info():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', type=str, default='0.0.0.0', help='The host to bind to')
-    parser.add_argument('--port', type=int, default=5000, help='The port to listen on')
+    parser.add_argument('--port', type=int, default=80, help='The port to listen on')
     parser.add_argument('--mode', type=str, default='production', help='Run mode: development or production')
     args = parser.parse_args()
     port = int(os.environ.get('WEBSITE_PORT', args.port))
