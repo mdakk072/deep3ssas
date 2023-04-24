@@ -1,16 +1,13 @@
 import base64
-import copy
 import json
 import logging
-import threading
 import time
-import urllib.request
-from io import BytesIO
 import cv2
 import numpy as np
 import requests
 import torch
 from bs4 import BeautifulSoup
+import argparse
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -28,12 +25,12 @@ class NumpyEncoder(json.JSONEncoder):
 # Log the start of the program
 #logging.info('Program started.')
 
-class ParkingLotDetector:
-    def __init__(self, model_path='best.pt', video_path='test.mp4', camera=False, cameraid=0):
+class DetectionModule:
+    def __init__(self, model_path='best.pt', video_path="", camera=False, cameraid=0, test=False):
         self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
         if camera:
             self.cap = cv2.VideoCapture(cameraid)
-        elif video_path: 
+        elif video_path!="": 
             self.cap = cv2.VideoCapture(video_path)
         self.fps_start = cv2.getTickCount()
         self.frame_count = 0
@@ -42,10 +39,22 @@ class ParkingLotDetector:
         self.readyToSend = True
         self.proccess = True
         self.frameTosend = None
+        self.parkings={}
+        if video_path!="" or camera:
+            self.parkings[0]={
+            "id": 0,
+            "source": 'Local',
+            "detections": {},
+            "image": None,
+            "freespace": 0,
+            "sourceInfos": None
+            }
+            
         with open('parking_structure.json', 'r') as f:
-            self.parkings = json.load(f)
+            self.parkings.update(json.load(f))
         self.parkingsSendCopy = self.parkings.copy()
         self.currentParkingID = 0
+        self.test = test  # Add test attribute
 
     def getLocalisation(self):
         try:
@@ -53,7 +62,6 @@ class ParkingLotDetector:
             url = f'http://ip-api.com/json/{ip_address}'
             response = requests.get(url)
             response.raise_for_status()  # Raise an exception if the status code is not 200
-
             location = response.json()
             location_keys = ['country', 'city', 'lat', 'lon', 'regionName', 'timezone', 'zip', 'countryCode']
             locationInfos = {key: location.get(key, f'None ({key} Error)') for key in location_keys}
@@ -88,8 +96,9 @@ class ParkingLotDetector:
                     try:
                         r = requests.post(link2, data=json_response, headers={'Content-Type': 'application/json'})
                         self.proccess=True
-                        print(r)
-                        print('data sent !')
+                        #print(r)
+                        #print('data sent !')
+                        return r
                     except Exception as e:
                         #logging.error('Error occurred while sending data to API: {}'.format(e))
                         print('Error occurred while sending data to API: {}'.format(e))
@@ -161,39 +170,58 @@ class ParkingLotDetector:
                 elapsed_time = current_time - start_time
                 for idx, p in enumerate(self.parkings, start=1):
                     time.sleep(0.05)
-                    print(f'========== Parking {p}/{len(self.parkings)} ==========')
+                    #print(f'========== Parking {p}/{len(self.parkings)} ==========')
                     self.currentParkingID = p
                     parking = self.parkings[p]
-                    if not self.currentParkingID:
+                    if not self.currentParkingID and self.cap != None:
+                        ret, frame = self.cap.read()
+                    else:
+                        #print(f'>Getting remote Parking ID {p} from source: {parking["source"]}')
+                        try:
+                            frame = self.get_remote_image()
+                        except Exception as e:
+                            print(f">! Failed to get remote image: {e}")
+                            continue
+                    #print('>Detecting parking spaces in the frame.')
+                    try:
+                        parking['image'], parking['detections'] = self.detect_frame(frame)
+                        #print('Detect OK!')
+                    except Exception as e:
+                        print(f">! Failed to detect parking spaces: {e}")
                         continue
-                    print(f'>Getting remote Parking ID {p} from source: {parking["source"]}')
-                    frame = self.get_remote_image()
-                    print('>Detecting parking spaces in the frame.')
-                    parking['image'], parking['detections'] = self.detect_frame(frame)
-                    print('Detect OK!')
                     self.frame_count += 1
-                    cv2.imshow('Processed Frame with Detections', parking['image'])
-                    print(parking['detections'])
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    if self.test:
+                        continue
+                    #print(parking['detections'])
                     time.sleep(1)
-                print(f'>Check API ... ')
+                #print(f'>Check API ... ')
                 if self.readyToSend:
-                    print('Preparing parkings data to be sent to the API.')
+                    #print('Preparing parkings data to be sent to the API.')
                     self.parkingsSendCopy = self.prepare_parkings_data(self.parkings)
-                    self.update_API(self.parkingsSendCopy)
-                else:
-                    print(f'>{elapsed_time}s...')
+                    try:
+                        self.update_API(self.parkingsSendCopy)
+                    except Exception as e:
+                        print(f">! Failed to update API: {e}")
+                        continue
                 start_time = current_time
+                if self.test:
+                    break
             except KeyboardInterrupt:
                 self.readyToSend = -1
                 break
             except Exception as e:
-                print("!!An exception occurred: {}".format(e))
+                print(">! An exception occurred: {}".format(e))
                 self.readyToSend = -1
-                self.cap.release()
-                cv2.destroyAllWindows()
-
+                if self.cap != None:
+                    self.cap.release()
 if __name__ == "__main__":
-        p=ParkingLotDetector(model_path='best.pt', camera=False, cameraid=1)
+    parser = argparse.ArgumentParser(description="Detection Module")
+    parser.add_argument('--model', type=str, default='best.pt', help="Chemin vers le fichier de modèle.")
+    parser.add_argument('--video', type=str, default='', help="Chemin vers le fichier vidéo.")
+    parser.add_argument('--camera', action='store_true', help="Utiliser la caméra pour la détection.")
+    parser.add_argument('--cameraid', type=int, default=1, help="ID de la caméra à utiliser.")
+    parser.add_argument('--test', action='store_true', help="Mode test, arrête la boucle principale après un cycle.")  
+    args = parser.parse_args()
+    if args.test:
+        p = DetectionModule(model_path=args.model, video_path=args.video, camera=args.camera, cameraid=args.cameraid, test=args.test)
         p.runRemoteSource()
