@@ -214,7 +214,6 @@ class DetectionModule:
                 self.readyToSend = -1
                 if self.cap != None:
                     self.cap.release()
-''''''
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Detection Module")
     parser.add_argument('--model', type=str, default='best.pt', help="Chemin vers le fichier de modèle.")
@@ -223,5 +222,6 @@ if __name__ == "__main__":
     parser.add_argument('--cameraid', type=int, default=1, help="ID de la caméra à utiliser.")
     parser.add_argument('--test', action='store_true', help="Mode test, arrête la boucle principale après un cycle.")  
     args = parser.parse_args()
-    # p = DetectionModule(model_path=args.model, video_path=args.video, camera=args.camera, cameraid=args.cameraid, test=args.test)
-    # p.runRemoteSource()
+    if args.test:
+        p = DetectionModule(model_path=args.model, video_path=args.video, camera=args.camera, cameraid=args.cameraid, test=args.test)
+        p.runRemoteSource()
