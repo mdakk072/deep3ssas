@@ -30,7 +30,9 @@ def test_detection_module():
 
     # Test if the update_API method sends a POST request successfully
     data_to_send = detection_module.prepare_parkings_data({0: {"id": 0, "source": "test", "detections": {}, "image": None, "freespace": 0, "sourceInfos": None}})
-    response = detection_module.update_API(data_to_send)
+    test=True
+    currentParkingID=7
+    response = detection_module.update_API(data_to_send,currentParkingID,test)
     assert response.status_code == 200
 
     # Test if the runRemoteSource method runs without errors
