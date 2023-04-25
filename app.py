@@ -103,7 +103,7 @@ def handle_parking_id():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', type=str, default='0.0.0.0', help='The host to bind to')
-    parser.add_argument('--port', type=int, default=80, help='The port to listen on')
+    parser.add_argument('--port', type=int, default=5000, help='The port to listen on')
     args = parser.parse_args()
     port = int(os.environ.get('WEBSITE_PORT', args.port))
     app.run(host=args.host, port=port, debug=True)
