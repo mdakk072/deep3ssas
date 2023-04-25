@@ -88,7 +88,7 @@
                                                             {% if key not in ['detections', 'sourceInfos','image','freespace'] %}
                                                                 <div class="col-md-6">
                                                                     {% if key=="source" %}
-                                                                    <p class="mb-2"><strong>{{ key }}:</strong> <a href="{{ value }}">{{ value }}</a></p>
+                                                                    <p class="mb-2"><strong>{{ key }}:</strong> <a href="{{ value }}">view source </a></p>
 
                                                                     {% else %}
                                                                     <p class="mb-2"><strong>{{ key }}:</strong> {{ value }}</p>
@@ -125,13 +125,9 @@
                                     {% else %}
                                         <p>{{ parking_data }}</p>
                                     {% endif %}
-                                </div>
-                                
-                                
-                                
+                                </div>    
                             </div>
                         </div>
-
                         {% endif %}
                         {% endfor %}
                     </div>
