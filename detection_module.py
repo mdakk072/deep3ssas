@@ -176,7 +176,7 @@ class DetectionModule:
                     self.currentParkingID = p
                     try:
                         # Post self.currentParkingID to the newly created endpoint
-                        url = "http://localhost:80/currentID"
+                        url = "http://localhost:5000/currentID"
                         data = {"current_parking_id": self.currentParkingID}
                         response = requests.post(url, json=data)
 
