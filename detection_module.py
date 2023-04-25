@@ -211,7 +211,7 @@ class DetectionModule:
                     #print(parking['detections'])
                     time.sleep(1)
                 #print(f'>Check API ... ')
-                if self.readyToSend:
+                if self.readyToSend and not self.test:
                     try:
                         self.update_API(self.prepare_parkings_data(self.parkings), self.currentParkingID, self.test)
 
