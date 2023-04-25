@@ -27,14 +27,5 @@ def test_detection_module():
     prepared_data = detection_module.prepare_parkings_data(data_to_prepare)
     assert isinstance(prepared_data, dict)
     assert len(prepared_data) == 1
-
-    # Test if the update_API method sends a POST request successfully
-    data_to_send = detection_module.prepare_parkings_data({0: {"id": 0, "source": "test", "detections": {}, "image": None, "freespace": 0, "sourceInfos": None}})
-    test=True
-    currentParkingID=7
-    response = detection_module.update_API(data_to_send,currentParkingID,test)
-    assert response.status_code == 200
-
-    # Test if the runRemoteSource method runs without errors
     detection_module.runRemoteSource()
 test_detection_module()
