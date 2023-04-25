@@ -1,0 +1,16 @@
+
+    {% for parking_id, parking_data in my_dict['parkings'].items() %}
+    <div class="parking-info">
+        <h2>Parking ID: {{ parking_id }}</h2>
+        {% if parking_data is mapping %}
+            {% for key, value in parking_data.items() %}
+            <p><strong>{{ key }}:</strong> {{ value }}</p>
+            {% endfor %}
+            {% if parking_data.image %}
+            <img src="{{ url_for('static', filename=parking_data.image) }}" width="50%" height="50%" alt="Parking Image">
+            {% endif %}
+        {% else %}
+            <p>{{ parking_data }}</p>
+        {% endif %}
+    </div>
+    {% endfor %}

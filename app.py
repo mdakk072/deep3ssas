@@ -1,27 +1,23 @@
 import json
-from flask import Flask, jsonify, request
-from detection_module import DetectionModule,NumpyEncoder
-import threading
-import argparse
+import base64
 import os
+import argparse
+from flask import Flask, jsonify, request, render_template
+
 app = Flask(__name__)
-# Initialiser le module de détection
-detection_module = DetectionModule()
-# Fonction pour exécuter le module de détection dans un thread séparé
-def run_detection_module():
-    detection_module.runRemoteSource()
 
-# Démarrer un thread pour exécuter le module de détection
-detection_thread = threading.Thread(target=run_detection_module)
-detection_thread.start()
+def load_infos():
+    if os.path.exists('infos.json'):
+        with open('infos.json', 'r') as f:
+            return json.load(f)
+    else:
+        return {}
+infos = load_infos()
 
-@app.route('/current_parking_id', methods=['GET'])
-def get_current_parking_id():
-    return jsonify({"current_parking_id": detection_module.currentParkingID})
-
-@app.route('/ready_to_send', methods=['GET'])
-def get_ready_to_send():
-    return jsonify({"ready_to_send": detection_module.readyToSend})
+def save_infos(infos):
+    with open('infos.json', 'w') as f:
+        json.dump(infos, f)
+    load_infos()
 
 @app.route('/parking_structure', methods=['GET'])
 def get_parking_structure():
@@ -29,38 +25,88 @@ def get_parking_structure():
         parking_structure = json.load(f)
     return jsonify(parking_structure)
 
-@app.route('/detection_module_info', methods=['GET'])
-def get_detection_module_info():
-    module_info = {
-        "fps_start": detection_module.fps_start,
-        "frame_count": detection_module.frame_count,
-        "colorStates": detection_module.colorStates,
-        "strStates": detection_module.strStates,
-        "readyToSend": detection_module.readyToSend,
-        "proccess": detection_module.proccess,
-        "frameTosend": detection_module.frameTosend,
-        "currentParkingID": detection_module.currentParkingID,
-        "test": detection_module.test,
-    }
-    return jsonify(module_info)
+@app.route('/status', methods=['GET'])
+def get_status():
+    response = jsonify(infos)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/status', methods=['POST'])
+def update_status():
+    global infos
+    my_dict = request.get_json()
+
+    for outer_key, inner_dict in my_dict['parkings'].items():
+        if inner_dict.get('image') is not None:
+            base64_image = inner_dict['image']
+            image_data = base64.b64decode(base64_image)
+            images_directory = "/static/images/"
+        if not os.path.exists(images_directory):
+            os.makedirs(images_directory)
+
+        # Save the image
+        with open(f"static/images/camera_{outer_key}.jpg", "wb") as f:
+            f.write(image_data)
+            inner_dict['image'] = f"/images/camera_{outer_key}.jpg"
+    infos['parkings'] = my_dict['parkings'].copy()
+    infos["current_parking_id"] = my_dict["current_parking_id"]
+    infos["number_of_parkings"] = len(my_dict['parkings'])
+    infos["test"] = my_dict["test"]
+
+    save_infos(infos)
+    infos=load_infos()
+
+    return jsonify({'message': 'Status updated successfully'})
+
+@app.route('/', methods=['GET'])
+def index():
+    if infos:
+        return render_template('index.html', my_dict=infos)
+    else:
+        return jsonify({'message': 'No infos'})
+@app.route('/map', methods=['GET'])
+def map():
+    if infos:
+        return render_template('map.html', my_dict=infos)
+    else:
+        return jsonify({'message': 'No infos'})
+
+@app.route('/status/<parking_id>', methods=['GET'])
+def get_parking_status_by_id(parking_id):
+    parkings = infos.get('parkings', {})
+    if parking_id in parkings:
+        response = jsonify(parkings[parking_id])
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    else:
+        return jsonify({'message': f'No parking found with ID {parking_id}'})
+
+@app.route('/currentID', methods=['POST', 'GET'])
+def handle_parking_id():
+    if request.method == 'POST':
+        current_parking_id = request.json.get("current_parking_id")
+        if current_parking_id is not None:
+            infos["current_parking_id"] = current_parking_id
+            save_infos(infos)
+            return jsonify({'message': 'Current parking ID updated successfully'})
+        else:
+            return jsonify({'message': 'Invalid data provided'}), 400
+    elif request.method == 'GET':
+        current_parking_id = infos.get("current_parking_id")
+        if current_parking_id is not None:
+            response = jsonify({"current_parking_id": current_parking_id})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        else:
+            return jsonify({'message': 'Current parking ID not found'}), 404
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', type=str, default='0.0.0.0', help='The host to bind to')
     parser.add_argument('--port', type=int, default=80, help='The port to listen on')
-    parser.add_argument('--mode', type=str, default='production', help='Run mode: development or production')
     args = parser.parse_args()
     port = int(os.environ.get('WEBSITE_PORT', args.port))
-
-    if args.mode == 'development':
-        app.config['ENV'] = 'development'
-        app.config['DEBUG'] = True
-    else:
-        app.config['ENV'] = 'production'
-        app.config['DEBUG'] = False
-
-    app.run(host=args.host, port=port)
-
+    app.run(host=args.host, port=port, debug=True)
 
 if __name__ == '__main__':
     main()

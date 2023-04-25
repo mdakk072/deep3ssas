@@ -28,10 +28,9 @@ class NumpyEncoder(json.JSONEncoder):
 class DetectionModule:
     def __init__(self, model_path='best.pt', video_path="", camera=False, cameraid=0, test=False):
         self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
-        if camera:
-            self.cap = cv2.VideoCapture(cameraid)
-        elif video_path!="": 
-            self.cap = cv2.VideoCapture(video_path)
+        if camera:           self.cap = cv2.VideoCapture(cameraid)
+        elif video_path!="": self.cap = cv2.VideoCapture(video_path)
+        else:                self.cap=None
         self.fps_start = cv2.getTickCount()
         self.frame_count = 0
         self.colorStates = [(0, 0, 255), (0, 255, 0)]
@@ -52,7 +51,6 @@ class DetectionModule:
             
         with open('parking_structure.json', 'r') as f:
             self.parkings.update(json.load(f))
-        self.parkingsSendCopy = self.parkings.copy()
         self.currentParkingID = 0
         self.test = test  # Add test attribute
 
@@ -86,24 +84,28 @@ class DetectionModule:
         }
         return parkings_copy
 
-    def update_API(self,datatosend):
+    def update_API(self, datatosend, current_parking_id, test):
         try:
-                    parkings_data = datatosend
-                    #logging.info('Sending parkings data to API: {}'.format(parkings_data))
-                    #link1 = 'http://127.0.0.1:5000/status'
-                    link2 = 'http://mdakk072.pythonanywhere.com/status'
-                    json_response = json.dumps(parkings_data, cls=NumpyEncoder)
-                    try:
-                        r = requests.post(link2, data=json_response, headers={'Content-Type': 'application/json'})
-                        self.proccess=True
-                        #print(r)
-                        #print('data sent !')
-                        return r
-                    except Exception as e:
-                        #logging.error('Error occurred while sending data to API: {}'.format(e))
-                        print('Error occurred while sending data to API: {}'.format(e))
-                    # Reset the readyToSend flag
-                    self.readyToSend = True
+            data_to_send = {
+                'parkings': datatosend,
+                'current_parking_id': current_parking_id,
+                'test': test
+            }
+            #logging.info('Sending parkings data to API: {}'.format(parkings_data))
+            link2 = 'http://127.0.0.1:80/status'
+           # link2 = 'http://mdakk072.pythonanywhere.com/status'
+            json_response = json.dumps(data_to_send, cls=NumpyEncoder)
+            try:
+                r = requests.post(link2, data=json_response, headers={'Content-Type': 'application/json'})
+                self.proccess=True
+                #print(r)
+                #print('data sent !')
+                return r
+            except Exception as e:
+                #logging.error('Error occurred while sending data to API: {}'.format(e))
+                print('Error occurred while sending data to API: {}'.format(e))
+            # Reset the readyToSend flag
+            self.readyToSend = True
         except Exception as e:
             #logging.error('Error occurred while sending data to API: {}'.format(e))
             print(f'>Erreur API:  {e}')
@@ -172,6 +174,20 @@ class DetectionModule:
                     time.sleep(0.05)
                     #print(f'========== Parking {p}/{len(self.parkings)} ==========')
                     self.currentParkingID = p
+                    try:
+                        # Post self.currentParkingID to the newly created endpoint
+                        url = "http://localhost:80/currentID"
+                        data = {"current_parking_id": self.currentParkingID}
+                        response = requests.post(url, json=data)
+
+                        if response.status_code == 200:
+                            print(f"Current parking ID {self.currentParkingID}")
+                        else:
+                            print(f"Error posting current parking ID: {response.text}")
+                    except:
+                            print(f"Current parking ID {self.currentParkingID} (API not updated !)")
+
+
                     parking = self.parkings[p]
                     if not self.currentParkingID and self.cap != None:
                         ret, frame = self.cap.read()
@@ -196,10 +212,9 @@ class DetectionModule:
                     time.sleep(1)
                 #print(f'>Check API ... ')
                 if self.readyToSend:
-                    #print('Preparing parkings data to be sent to the API.')
-                    self.parkingsSendCopy = self.prepare_parkings_data(self.parkings)
                     try:
-                        self.update_API(self.parkingsSendCopy)
+                        self.update_API(self.prepare_parkings_data(self.parkings), self.currentParkingID, self.test)
+
                     except Exception as e:
                         print(f">! Failed to update API: {e}")
                         continue
@@ -214,6 +229,7 @@ class DetectionModule:
                 self.readyToSend = -1
                 if self.cap != None:
                     self.cap.release()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Detection Module")
     parser.add_argument('--model', type=str, default='best.pt', help="Chemin vers le fichier de modèle.")
@@ -222,6 +238,6 @@ if __name__ == "__main__":
     parser.add_argument('--cameraid', type=int, default=1, help="ID de la caméra à utiliser.")
     parser.add_argument('--test', action='store_true', help="Mode test, arrête la boucle principale après un cycle.")  
     args = parser.parse_args()
-    if args.test:
+    if args.test or 1:
         p = DetectionModule(model_path=args.model, video_path=args.video, camera=args.camera, cameraid=args.cameraid, test=args.test)
         p.runRemoteSource()

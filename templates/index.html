@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Deep3ssas{% endblock %}
+{% block content %}
+
+    <div class="hero-section">
+        <div class="overlay rounded"></div>
+        <div class="hero-text">
+            <h1>Welcome to Deep3ssas</h1>
+            <p>Deep3ssas is a cutting-edge parking detection system designed to help you find available parking spots with ease.</p>
+        </div>
+    </div>
+    <div class="m-3 rounded">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col title">
+                    <h2>Story</h2>
+                    <hr>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p>
+                        This project began as part of my Capstone Project, and I have been continually working to improve it. We work with public camera sources to provide parking information from various locations. Our system utilizes advanced computer vision and machine learning algorithms to analyze the footage from these cameras and determine available parking spots in real-time. This allows us to offer our users a convenient and efficient way to find parking spaces in busy urban areas, reducing the time spent searching for a spot and contributing to a better overall driving experience. As we continue to expand our coverage, we aim to make our service even more valuable to drivers in cities around the world.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="m-3 rounded">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col title">
+                    <h2>Current Developments</h2>
+                    <hr>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p>
+                        We are constantly working on expanding our coverage to include more parking locations. Here are some examples of the parking facilities we currently monitor and provide information for:
+                    </p>
+            <div id="map" class="rounded" style="width: 100%; height: 400px;"></div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="m-3 rounded">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col">
+                    <h2>Parking Infos</h2>
+                    <hr>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p> Here are some examples of parking detections. </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="accordion" id="parkingAccordion">
+                        {% for parking_id, parking_data in my_dict['parkings'].items() %}
+                         {% if  parking_data.id <5 %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ parking_id }}">
+                                <button class="accordion-button collapsed"  type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ parking_id }}" aria-expanded="false" aria-controls="collapse{{ parking_id }}">
+                                    Parking : {{ parking_id }}
+                                </button>
+                            </h2>
+                            <div id="collapse{{ parking_id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ parking_id }}" data-bs-parent="#parkingAccordion">
+                                <div class="accordion-body">
+                                    {% if parking_data is mapping %}
+                                        <div class="row">
+                                            <div class="col-md-6 d-flex justify-content-center align-items-center">
+                                                {% if parking_data.image %}
+                                                <img class="img-fluid rounded" src="{{ url_for('static', filename=parking_data.image) }}" alt="Parking Image" style="width: 100%; max-width: 500px; height: auto;">
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <h4 class="mb-4">Parking Details and Availability:</h4>
+                                                        <div class="row bg-light p-3 mb-3 rounded">
+                                                            {% for key, value in parking_data.items() %}
+                                                            {% if key not in ['detections', 'sourceInfos','image','freespace'] %}
+                                                                <div class="col-md-6">
+                                                                    {% if key=="source" %}
+                                                                    <p class="mb-2"><strong>{{ key }}:</strong> <a href="{{ value }}">{{ value }}</a></p>
+
+                                                                    {% else %}
+                                                                    <p class="mb-2"><strong>{{ key }}:</strong> {{ value }}</p>
+                                                                    {% endif %}
+                                                                </div>
+                                                            {% endif %}
+                                                            {% endfor %}
+                                                            {% if 'detections' in parking_data %}
+                                                                <div class="col-12">
+                                                                    <h4 class="mb-4">Detections:</h4>
+                                                                </div>
+                                                                {% for key, value in parking_data.detections.items() %}
+                                                                <div class="col-md-6">
+                                                                    <p class="mb-2"><strong>{{ key }}:</strong> {{ value }}</p>
+                                                                </div>
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {% if 'sourceInfos' in parking_data %}
+                                                                <div class="col-12">
+                                                                    <h4 class="mb-4">Source Information:</h4>
+                                                                </div>
+                                                                {% for key, value in parking_data.sourceInfos.items() %}
+                                                                <div class="col-md-6">
+                                                                    <p class="mb-2"><strong>{{ key }}:</strong> {{ value }}</p>
+                                                                </div>
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <p>{{ parking_data }}</p>
+                                    {% endif %}
+                                </div>
+                                
+                                
+                                
+                            </div>
+                        </div>
+
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col m-2">
+                    <p>
+                        We will continue to add more locations to our system and improve the accuracy and reliability of our parking detection algorithms. Our goal is to make finding a parking spot as easy and hassle-free as possible for drivers everywhere.
+                    </p>
+                    
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAccordion(parking_id) {
+            // Trigger a click on the accordion button to expand/collapse the accordion
+            console.log(parking_id)
+            var accordionButton = $("#heading" + parking_id + " button");
+            accordionButton.trigger("click");
+        
+            // Scroll to the accordion item
+            setTimeout(function() {
+                accordionButton[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+        
+
+        // Initialize the map
+        var map = L.map('map', {
+            minZoom: 2, // Le niveau de zoom minimum (1 pour voir toute la Terre)
+          }).setView([51.505, -0.09], 1); // Les coordonnées initiales et le niveau de zoom initial (1 pour voir toute la Terre)
+          
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }).addTo(map);
+          
+        
+        // Add parking locations to the map
+        var greenIcon = L.icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    
+        var redIcon = L.icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    
+        // Add parking locations to the map
+        {% for parking_id, parking_data in my_dict['parkings'].items() %}
+            {% if parking_data.sourceInfos.Latitude and parking_data.sourceInfos.Longitude and parking_data.id <5 %}
+                // Choose the appropriate icon
+                var icon = {{parking_data.detections.empty}} > 0 ? greenIcon : redIcon;
+                
+                L.marker([{{ parking_data.sourceInfos.Latitude|float }}, {{ parking_data.sourceInfos.Longitude|float }}], {icon: icon})
+                .addTo(map)
+                .bindPopup('<strong>Parking ID:</strong> {{ parking_id }}<br>' +
+                           '<strong>City:</strong> {{ parking_data.sourceInfos.City }}<br>' +
+                           '<strong>Country:</strong> {{ parking_data.sourceInfos.Country }}<br>' +
+                           '<strong>Region:</strong> {{ parking_data.sourceInfos.Region }}<br>' +
+                           '<strong>Timezone :</strong> {{ parking_data.sourceInfos.Timezone }}<br>' +
+                           '<strong>ZIP:</strong> {{ parking_data.sourceInfos.ZIP }}<br>' +
+                           '<button onclick="openAccordion({{ parking_id }})" class="btn btn-primary">View</button>');
+            {% endif %}
+        {% endfor %}
+
+    
+    </script>
+{% endblock %}
