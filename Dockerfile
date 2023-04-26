@@ -1,19 +1,23 @@
-# Utiliser une image de base Python
-FROM ultralytics/yolov5:latest-cpu
-# Définir le répertoire de travail
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
+
+# Set the working directory to /app
 WORKDIR /app
-# Copier les fichiers de configuration et d'installation
+
+# Copy the requirements.txt file into the container
 COPY requirements.txt .
-# Installer les dépendances de base et les dépendances OpenCV
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install gunicorn && \
-    apt-get update && \
-    apt-get install -y libgl1-mesa-glx libglib2.0-0
-# Copier le reste des fichiers du projet
+
+# Install Flask and requests packages
+RUN pip install Flask requests
+
+# Copy the rest of the application's code into the container
 COPY . .
-# Exposer le port 80 pour l'application Flask
+
+# Make port 80 available to the world outside this container
 EXPOSE 80
-# Lancer l'application avec Gunicorn en mode production
-# Exécutez votre script de détection et votre application Flask en arrière-plan
-CMD sh -c "python3 detection_module.py &" && \
-    gunicorn --bind 0.0.0.0:80 app:app
+
+# Install gunicorn
+RUN pip install gunicorn
+
+# Run the command to start the Flask app using Gunicorn
+CMD gunicorn --bind 0.0.0.0:80 app:app

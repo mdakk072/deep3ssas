@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Deep3ssas - Contact{% endblock %}
+{% block content %}
+
+<style>
+    .bg-img {
+        background-image: url('https://images.unsplash.com/photo-1570029604322-77c356acea7f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1173&q=80');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        position: relative;
+        height: 80vh;
+        width: 100%;
+    }
+    .overlay {
+        background: rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(5px);
+    }
+    .contact-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+</style>
+
+<div class="bg-img">
+    <div class="overlay"></div>
+    <div class="container contact-content">
+        <div class="row">
+            <div class="col text-center ">
+                <h2>Contact Deep3ssas</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <p>
+                    Originally, this project began as my capstone project. However, I decided to continue improving it by learning new things and exploring various technologies. I am constantly working to enhance the project and provide better functionality. If you have any suggestions, ideas for collaboration, or just want to get in touch, feel free to contact me at <a href="mailto:mounir.dakkak@gmail.com" class="text-decoration-none text-light">mounir.dakkak@gmail.com</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

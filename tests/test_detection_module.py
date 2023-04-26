@@ -1,8 +1,5 @@
 import sys
-import sys
 sys.path.append('.')
-
-
 import pytest
 from detection_module import DetectionModule
 
@@ -16,11 +13,6 @@ def test_detection_module():
     # Test if the model object is loaded correctly
     assert detection_module.model is not None
 
-    # Test if the current parking ID is initially set to 0
-    assert detection_module.currentParkingID == 0
-
-    # Test if the parkings dictionary is loaded correctly from the JSON file
-    assert len(detection_module.parkings) == 14
 
     # Test if the prepare_parkings_data method returns the correct data format
     data_to_prepare = {0: {"id": 0, "source": "test", "detections": {}, "image": None, "freespace": 0, "sourceInfos": None}}

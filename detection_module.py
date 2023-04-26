@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+from threading import Thread
 import time
 import cv2
 import numpy as np
@@ -39,6 +40,9 @@ class DetectionModule:
         self.proccess = True
         self.frameTosend = None
         self.parkings={}
+        self.APIurl="http://localhost"
+        self.APIurl="https://mdakk072.pythonanywhere.com"
+
         if video_path!="" or camera:
             self.parkings[0]={
             "id": 0,
@@ -47,6 +51,7 @@ class DetectionModule:
             "image": None,
             "freespace": 0,
             "sourceInfos": None
+            
             }
             
         with open('parking_structure.json', 'r') as f:
@@ -92,14 +97,12 @@ class DetectionModule:
                 'test': test
             }
             #logging.info('Sending parkings data to API: {}'.format(parkings_data))
-            link2 = 'http://127.0.0.1:80/status'
+            url = f'{self.APIurl}/status'
            # link2 = 'http://mdakk072.pythonanywhere.com/status'
             json_response = json.dumps(data_to_send, cls=NumpyEncoder)
             try:
-                r = requests.post(link2, data=json_response, headers={'Content-Type': 'application/json'})
+                r = requests.post(url, data=json_response, headers={'Content-Type': 'application/json'})
                 self.proccess=True
-                #print(r)
-                #print('data sent !')
                 return r
             except Exception as e:
                 #logging.error('Error occurred while sending data to API: {}'.format(e))
@@ -115,9 +118,7 @@ class DetectionModule:
             for _, detection in detections.iterrows():
                 xmin, ymin, xmax, ymax = map(int, detection[['xmin', 'ymin', 'xmax', 'ymax']].tolist())
                 confidence, state = round(float(detection['confidence']), 2), int(detection['class'])
-                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), self.colorStates[state], 2)
-                cv2.putText(frame, f"{self.strStates[state]}:{confidence}%", ((xmax + xmin) // 2, (ymin + ymax) // 2),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), self.colorStates[state], 1)
         frame_resized = cv2.resize(frame, (640, 640))
         img_processed = cv2.GaussianBlur(frame_resized, (5, 5), 0)
         img_processed = cv2.addWeighted(img_processed, 1.5, frame_resized, -0.5, 0)
@@ -127,11 +128,7 @@ class DetectionModule:
         total = len(detections)
         data_to_post = {'full': total - free, 'empty': free, 'places': total}
         draw_detections(frame_resized, detections)
-        cv2.rectangle(frame_resized, (260, 10), (530, 40), (0, 255, 0), cv2.FILLED)
-        cv2.putText(frame_resized, f"Free Space: {free}/{total}", (280, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 0), 1, cv2.LINE_AA)
-        cv2.rectangle(frame_resized, (260, 50), (550, 80), (0, 0, 255), cv2.FILLED)
-        cv2.putText(frame_resized, f"Occupied Space: {total - free}/{total}", (265, 70), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 1, cv2.LINE_AA)
-        return frame_resized, data_to_post
+        return frame_resized, data_to_post ,detections.to_dict(orient='records')
 
     def get_remote_image(self):
         def parse_camera_details(soup):
@@ -146,6 +143,10 @@ class DetectionModule:
                         details_dict[key] = value
                 return details_dict
             return None
+        def capture_remote_image(image_url, result):
+            cap = cv2.VideoCapture(image_url)
+            ret, frame = cap.read()
+            result.append(frame)
         url = self.parkings[self.currentParkingID]['source']
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
         response = requests.get(url, headers=headers)
@@ -155,9 +156,15 @@ class DetectionModule:
             img_tag = soup.find("img")
             if img_tag:
                 img_url = img_tag["src"]
-                cap = cv2.VideoCapture(img_url)
-                ret, frame = cap.read()
-                return frame
+                result = []
+                image_thread = Thread(target=capture_remote_image, args=(img_url, result))
+                image_thread.start()
+                image_thread.join(timeout=20)  # Set the timeout in seconds
+                if image_thread.is_alive():
+                    print("Timeout reached, stopping image capture.")
+                    return None
+                else:
+                    return result[0] if result else None
             else:
                 print("No <img> tag found.")
         else:
@@ -168,24 +175,25 @@ class DetectionModule:
         start_time = time.time()
         while True:
             try:
-                current_time = time.time()
-                elapsed_time = current_time - start_time
+                
                 for idx, p in enumerate(self.parkings, start=1):
                     time.sleep(0.05)
                     #print(f'========== Parking {p}/{len(self.parkings)} ==========')
                     self.currentParkingID = p
-                    try:
-                        # Post self.currentParkingID to the newly created endpoint
-                        url = "http://localhost:5000/currentID"
-                        data = {"current_parking_id": self.currentParkingID}
-                        response = requests.post(url, json=data)
+                    print(f"Current parking ID {self.currentParkingID}          " ,end='\r')
+                    
+                    # try:
+                    #     # Post self.currentParkingID to the newly created endpoint
+                    #     url = f"{self.APIurl}/currentID"
+                    #     data = {"current_parking_id": self.currentParkingID}
+                    #     response = requests.post(url, json=data)
 
-                        if response.status_code == 200:
-                            print(f"Current parking ID {self.currentParkingID}")
-                        else:
-                            print(f"Error posting current parking ID: {response.text}")
-                    except:
-                            print(f"Current parking ID {self.currentParkingID} (API not updated !)")
+                    #     if response.status_code == 200:
+                    #         print(f"Current parking ID {self.currentParkingID}")
+                    #     else:
+                    #         print(f"Error posting current parking ID: {response.text}")
+                    # except:
+                    #         print(f"Current parking ID {self.currentParkingID} (API not updated !)")
 
 
                     parking = self.parkings[p]
@@ -194,13 +202,14 @@ class DetectionModule:
                     else:
                         #print(f'>Getting remote Parking ID {p} from source: {parking["source"]}')
                         try:
-                            frame = self.get_remote_image()
+                            f=self.get_remote_image() 
+                            frame = f if f is not None else frame
                         except Exception as e:
                             print(f">! Failed to get remote image: {e}")
                             continue
                     #print('>Detecting parking spaces in the frame.')
                     try:
-                        parking['image'], parking['detections'] = self.detect_frame(frame)
+                        parking['image'], parking['detections'] , parking['labels'] = self.detect_frame(frame)
                         #print('Detect OK!')
                     except Exception as e:
                         print(f">! Failed to detect parking spaces: {e}")
@@ -211,10 +220,15 @@ class DetectionModule:
                     #print(parking['detections'])
                     time.sleep(1)
                 #print(f'>Check API ... ')
+                current_time = time.time()
+                elapsed_time = current_time - start_time
                 if self.readyToSend and not self.test:
-                    try:
-                        self.update_API(self.prepare_parkings_data(self.parkings), self.currentParkingID, self.test)
 
+                    try:
+                        
+                        response= self.update_API(self.prepare_parkings_data(self.parkings), self.currentParkingID, self.test)
+                        
+                        print(f">! update API ({self.APIurl}) : {response} {elapsed_time}s")
                     except Exception as e:
                         print(f">! Failed to update API: {e}")
                         continue

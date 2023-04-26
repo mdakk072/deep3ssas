@@ -153,7 +153,8 @@
                        '<strong>Region:</strong> {{ parking_data.sourceInfos.Region }}<br>' +
                        '<strong>Timezone :</strong> {{ parking_data.sourceInfos.Timezone }}<br>' +
                        '<strong>ZIP:</strong> {{ parking_data.sourceInfos.ZIP }}<br>' +
-                       '<button class="btn btn-primary" onclick="openLocationModal({{ parking_id }})">View</button>'
+                       '<strong>Updated:</strong> {{ my_dict['last_update'] }} seconds ago<br>'+
+                       '<button class="btn btn-outline-primary" onclick="openLocationModal({{ parking_id }})">View</button>'
                        );
 
             // No need to add the click event listener here, as it's now handled by the button's onclick event
@@ -185,13 +186,45 @@
         document.getElementById('locationModalLatitude').innerHTML = parking_data.sourceInfos.Latitude;
         document.getElementById('locationModalLongitude').innerHTML = parking_data.sourceInfos.Longitude;
 
-        // Replace the image URL with your own image source
-        document.getElementById('locationModalImg').src = parkingDataImages[parking_id-1];
+        const emptySpaces = parking_data.detections.empty;
+        const fullSpaces = parking_data.detections.full;
+        const totalSpaces = parking_data.detections.places;
+        function findImageUrl(parking_id, parkingDataImages) {
+          for (let i = 0; i < parkingDataImages.length; i++) {
+              const url = parkingDataImages[i];
+              const urlParts = url.split('/');
+              const fileName = urlParts[urlParts.length - 1];
+              const idFromFileName = parseInt(fileName.split('_')[1], 10);
       
+              if (idFromFileName === parking_id) {
+                  return url;
+              }
+          }
+          return null;
+      }
+      
+      const imageUrl = findImageUrl(parking_id, parkingDataImages);
+      
+      if (imageUrl) {
+          document.getElementById('locationModalImg').src = imageUrl;
+      } else {
+          console.error(`Image not found for parking_id: ${parking_id}`);
+      }
+      
+        const emptyPercentage =  totalSpaces>0 ?  (emptySpaces / totalSpaces) * 100:0;
+        const fullPercentage =  totalSpaces>0 ?  (fullSpaces / totalSpaces) * 100:0;
+
+        document.getElementById('barreFree').setAttribute('aria-valuenow', emptySpaces);
+        document.getElementById('barreFree').style.width = emptyPercentage + '%';
+        document.getElementById('barreFull').setAttribute('aria-valuenow', fullSpaces);
+        document.getElementById('barreFull').style.width = fullPercentage + '%';
+        document.getElementById('locationModalFree').innerHTML = emptyPercentage.toFixed(0) + '%';
+        document.getElementById('locationModalFullProgress').innerHTML = fullPercentage.toFixed(0) + '%';
+
         // Show the modal
         var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
         myModal.show();
       }
-      var parkingDataImages=[{% for parking_id, parking_data in my_dict['parkings'].items() %} "{{ url_for('static', filename=parking_data.image) }}",{% endfor %} ]
+      var parkingDataImages=[{% for parking_id, parking_data in my_dict['parkings'].items() %} "{{ parking_data.image }}",{% endfor %} ]
 </script>
 {% endblock %}

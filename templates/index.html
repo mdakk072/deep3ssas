@@ -67,8 +67,24 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="heading{{ parking_id }}">
                                 <button class="accordion-button collapsed"  type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ parking_id }}" aria-expanded="false" aria-controls="collapse{{ parking_id }}">
-                                    Parking : {{ parking_id }}
+
+                                    <div class="row">
+                                        <div class="col">
+                                    <strong>Parking  {{ parking_id }} : </strong> 
+                                            
+                                        </div>
+                                        <div class="col">
+                                          <span class="text-success">Empty spaces: {{ parking_data.detections.empty }}</span>
+                                        </div>
+                                        <div class="col">
+                                          <span class="text-danger">Full spaces: {{ parking_data.detections.full }}</span>
+                                        </div>
+                                        <div class="col p-1">
+                                            <span class="text-primary ">Last update: {{ my_dict['last_update'] }} s</span>
+                                          </div>
+                                      </div>
                                 </button>
+                                
                             </h2>
                             <div id="collapse{{ parking_id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ parking_id }}" data-bs-parent="#parkingAccordion">
                                 <div class="accordion-body">
@@ -76,7 +92,7 @@
                                         <div class="row">
                                             <div class="col-md-6 d-flex justify-content-center align-items-center">
                                                 {% if parking_data.image %}
-                                                <img class="img-fluid rounded" src="{{ url_for('static', filename=parking_data.image) }}" alt="Parking Image" style="width: 100%; max-width: 500px; height: auto;">
+                                                <img class="img-fluid rounded" src="{{parking_data.image}}" alt="Parking Image" style="width: 100%; max-width: 500px; height: auto;">
                                                 {% endif %}
                                             </div>
                                             <div class="col-md-6">
@@ -85,10 +101,10 @@
                                                         <h4 class="mb-4">Parking Details and Availability:</h4>
                                                         <div class="row bg-light p-3 mb-3 rounded">
                                                             {% for key, value in parking_data.items() %}
-                                                            {% if key not in ['detections', 'sourceInfos','image','freespace'] %}
+                                                            {% if key not in ['detections', 'sourceInfos','image','freespace','labels'] %}
                                                                 <div class="col-md-6">
                                                                     {% if key=="source" %}
-                                                                    <p class="mb-2"><strong>{{ key }}:</strong> <a href="{{ value }}">view source </a></p>
+                                                                    <p class="mb-2"><strong>{{ key }}:</strong> <a href="{{ value }}"  target="_blank">view source </a></p>
 
                                                                     {% else %}
                                                                     <p class="mb-2"><strong>{{ key }}:</strong> {{ value }}</p>
@@ -202,6 +218,8 @@
                            '<strong>Region:</strong> {{ parking_data.sourceInfos.Region }}<br>' +
                            '<strong>Timezone :</strong> {{ parking_data.sourceInfos.Timezone }}<br>' +
                            '<strong>ZIP:</strong> {{ parking_data.sourceInfos.ZIP }}<br>' +
+                           '<strong>Updated:</strong> {{ my_dict['last_update'] }} seconds ago<br>'+
+
                            '<button onclick="openAccordion({{ parking_id }})" class="btn btn-primary">View</button>');
             {% endif %}
         {% endfor %}

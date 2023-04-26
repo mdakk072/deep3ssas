@@ -19,3 +19,5 @@ seaborn>=0.11.0
 bs4
 flask
 gunicorn
+flask_cors
+schedule
