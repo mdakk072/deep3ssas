@@ -20,3 +20,5 @@ bs4
 flask
 gunicorn
 flask_cors
+azure-storage-blob
+psycopg2
