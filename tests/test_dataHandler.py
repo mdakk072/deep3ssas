@@ -1,33 +1,36 @@
-import json
+
 import os
+import json
+import tempfile
 import sys
 sys.path.append('.')
-import tempfile
-import base64
-import pytest
-from modules.data_handler.dataHandler import app, load_infos, save_infos
-
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
-
-def test_parking_structure(client):
-    response = client.get('/parking_structure')
-    assert response.status_code == 200
-    assert isinstance(json.loads(response.data), dict)
-
-def test_get_status(client):
-    response = client.get('/status')
-    assert response.status_code == 200
-    assert response.headers['Access-Control-Allow-Origin'] == '*'
-    assert isinstance(json.loads(response.data), dict)
+from modules.data_handler.app import load_infos, save_infos, convert_to_yolo_format, find_file, get_credentials
 
 
-def test_update_current_parking_id(client):
-    data = {"current_parking_id": "2"}
 
-    response = client.post('/currentID', json=data)
-    assert response.status_code == 200
-    assert json.loads(response.data)["status"] == "success"
+def test_convert_to_yolo_format():
+    label = {
+        'class': 1,
+        'xmin': 50,
+        'xmax': 150,
+        'ymin': 40,
+        'ymax': 120,
+    }
+    img_width = 640
+    img_height = 640
+
+    result = convert_to_yolo_format(label, img_width, img_height)
+
+    assert result == (1, 0.15625, 0.125, 0.15625, 0.125)
+
+def test_find_file():
+    test_filename = "test_file.txt"
+    with open(test_filename, "w") as f:
+        f.write("Test content")
+
+    found_file = find_file(test_filename)
+
+    os.remove(test_filename)
+
+    assert found_file is not None
+

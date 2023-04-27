@@ -1,14 +1,17 @@
 import os
 import json
 import base64
+import sys
 from flask import Flask, request, jsonify
 import datetime
 try:
-    from modules.data_handler.azure_blob_storage import AzureBlobStorage
-    import modules.data_handler.postgresql_handler as postgresql_handler
-except:
     from azure_blob_storage import AzureBlobStorage
     import postgresql_handler as postgresql_handler
+except:
+    sys.path.append('.')
+    from modules.data_handler.azure_blob_storage import AzureBlobStorage
+    import modules.data_handler.postgresql_handler as postgresql_handler
+    
 import xml.etree.ElementTree as ET
 
 def load_infos():
