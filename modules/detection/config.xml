@@ -1,7 +1,7 @@
 <config>
     <model_path>best.pt</model_path>
     <video_path></video_path>
-    <API_url>https://mdakk072.pythonanywhere.com</API_url>
+    <API_url>https://deep3ssasapi.azurewebsites.net</API_url>
     <camera>false</camera>
     <cameraid>1</cameraid>
     <test>false</test>

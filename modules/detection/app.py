@@ -250,7 +250,7 @@ class DetectionModule:
                     try:
                         response= self.update_API(self.prepare_parkings_data(self.parkings), self.currentParkingID, self.test)
                         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        print(f"[{timestamp}] > Update API ({self.APIurl}) : {response} {round(elapsed_time,2)}s")
+                        print(f"[{timestamp}] > Update API ({self.APIurl}/status) : {response} {round(elapsed_time,2)}s")
                     except Exception as e:
                         print(f">! Failed to update API: {e}")
                         continue

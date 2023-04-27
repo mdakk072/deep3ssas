@@ -6,9 +6,9 @@ import time
 from flask import Flask, jsonify , render_template
 
 DATA_HANDLER_URL = "http://127.0.0.1"
-DATA_HANDLER_URL = "https://mdakk072.pythonanywhere.com"
-
-WAIT_TIME = 3600#s
+DATA_HANDLER_URL = "https://deep3ssasapi.azurewebsites.net"
+#DATA_HANDLER_URL = "https://mdakk072.pythonanywhere.com"
+WAIT_TIME = 60#s
 app = Flask(__name__)
 last_refresh_time = time.time()
 
@@ -52,7 +52,7 @@ def get_status():
 
     if time.time() - last_refresh_time >= WAIT_TIME:
         update_infos()
-        print(time.time() - last_refresh_time)
+        #print(time.time() - last_refresh_time)
         last_refresh_time = time.time()
     infos['last_update']=int(time.time() - last_refresh_time)
     

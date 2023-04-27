@@ -1,0 +1,46 @@
+# Azure DevOps pipeline YAML
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Azure resource group name
+  resourceGroupName: 'your-resource-group-name'
+  # Azure App Service name
+  appServiceName: 'your-app-service-name'
+  # DockerHub username and password
+  dockerHubUsername: 'your-dockerhub-username'
+  dockerHubPassword: $(DOCKERHUB_PASSWORD)
+
+steps:
+- script: |
+    echo "Starting the build process"
+    # Install dependencies
+    pip install -r requirements.txt
+    # Run tests
+    pytest
+    # Build the Docker container
+    docker build -t your-dockerhub-username/your-app:latest .
+    echo "Finished the build process"
+  displayName: 'Build and test Docker container'
+  
+- script: |
+    echo "Logging in to DockerHub"
+    # Login to DockerHub
+    docker login -u your-dockerhub-username -p $DOCKERHUB_PASSWORD
+    # Push the Docker container to DockerHub
+    docker push your-dockerhub-username/your-app:latest
+    echo "Pushed Docker container to DockerHub"
+  displayName: 'Push Docker container to DockerHub'
+  
+- task: AzureWebAppContainer@1
+  displayName: 'Deploy to Azure Web App'
+  inputs:
+    appName: $(appServiceName)
+    imageName: 'your-dockerhub-username/your-app:latest'
+    multiContainerConfigFile: 'azure-web-app-linux-container.yml'
+    resourceGroupName: $(resourceGroupName)
+    containerCommand: 'python app.py'
+    environmentVariables: 'APP_SETTINGS=development'

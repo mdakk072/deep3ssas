@@ -1,5 +1,4 @@
 azure-storage-blob
 flask
 psycopg2
-pytz
 gunicorn

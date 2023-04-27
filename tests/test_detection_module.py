@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
 import pytest
-from modules.detection.detection_module import DetectionModule
+from modules.detection.app import DetectionModule
 
 def test_detection_module():
     # Instantiate the DetectionModule class with test=True

@@ -3,8 +3,12 @@ import json
 import base64
 from flask import Flask, request, jsonify
 import datetime
-from azure_blob_storage import AzureBlobStorage
-import postgresql_handler
+try:
+    from modules.data_handler.azure_blob_storage import AzureBlobStorage
+    import modules.data_handler.postgresql_handler as postgresql_handler
+except:
+    from azure_blob_storage import AzureBlobStorage
+    import postgresql_handler as postgresql_handler
 import xml.etree.ElementTree as ET
 
 def load_infos():
@@ -46,7 +50,7 @@ def find_file(filename, default_path=None):
     return None
 
 def get_credentials(filename='config.xml'):
-    env_vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'HOSTNAME', 'AZURE_CONNECTION_STRING', ]
+    env_vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'APIHOSTNAME', 'AZURE_CONNECTION_STRING', ]
     credentials = {var: os.environ.get(var) for var in env_vars}
 
     config_file = find_file(filename)
@@ -73,7 +77,7 @@ DB_PORT =                   credentials['DB_PORT']
 DB_NAME =                   credentials['DB_NAME']
 DB_USER =                   credentials['DB_USER']
 DB_PASSWORD =               credentials['DB_PASSWORD']
-HOSTNAME=                   credentials['HOSTNAME']
+HOSTNAME=                   credentials['APIHOSTNAME']
 AZURE_CONNECTION_STRING =   credentials['AZURE_CONNECTION_STRING']
 
 app = Flask(__name__)
@@ -92,7 +96,11 @@ def get_status():
     response = jsonify(infos)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
-
+@app.route('/test', methods=['GET'])
+def get_status2():
+    response = jsonify([HOSTNAME])
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 @app.route('/status', methods=['POST'])
 def update_status():
     global infos
@@ -150,11 +158,14 @@ def update_status():
         azure_blob_storage.upload_image(image_directory, f"{image_name}.jpg")
         azure_blob_storage.upload_label(label_directory, f"{image_name}.txt")
     conn.close()
+    
     infos['parkings'] = my_dict['parkings']
     infos["current_parking_id"] = my_dict["current_parking_id"]
     infos["number_of_parkings"] = len(my_dict['parkings'])
     infos["test"] = my_dict["test"]
     save_infos(infos)
+    del azure_blob_storage
+    del conn
     return jsonify({'message': 'Status updated successfully'})
 
 @app.route('/currentID', methods=['POST'])

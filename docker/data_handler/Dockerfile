@@ -5,16 +5,21 @@ FROM python:3.9
 WORKDIR /app
 
 # Copie les fichiers des exigences
-COPY requirements.txt .
+COPY ./modules/data_handler/requirements.txt .
 
 # Installe les exigences
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copie tous les fichiers de l'application
-COPY . .
+# Copie les fichiers de l'application
+COPY ./modules/data_handler /app/modules/data_handler
+COPY ./static /app/modules/data_handler/static
+# Copie les fichiers à la racine du projet (sans les dossiers)
+COPY ./*.txt /app/
+COPY ./*.json /app/
+# Expose le port sur lequel l'application écoutera
+EXPOSE 80
 
-# Expose le port sur lequel Gunicorn écoutera
-EXPOSE 8000
+# Exécute l'application
 
-# Exécute Gunicorn pour lancer l'application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["python",  "modules/data_handler/app.py"]
+#CMD ["gunicorn", "--bind", "0.0.0.0:80", "modules.data_handler.app:app"]
