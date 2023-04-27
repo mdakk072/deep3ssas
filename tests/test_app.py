@@ -5,8 +5,8 @@ sys.path.append('.')
 
 import tempfile
 import pytest
-from app import app, load_infos, save_infos
 
+from modules.web_app.app import app, load_infos, save_infos
 
 @pytest.fixture
 def client():

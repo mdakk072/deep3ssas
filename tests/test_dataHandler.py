@@ -5,7 +5,7 @@ sys.path.append('.')
 import tempfile
 import base64
 import pytest
-from dataHandler import app, load_infos, save_infos
+from modules.data_handler.dataHandler import app, load_infos, save_infos
 
 @pytest.fixture
 def client():

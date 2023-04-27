@@ -3,7 +3,7 @@ import os
 import argparse
 import requests
 import time
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify , render_template
 
 DATA_HANDLER_URL = "http://127.0.0.1"
 DATA_HANDLER_URL = "https://mdakk072.pythonanywhere.com"

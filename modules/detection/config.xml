@@ -1,0 +1,9 @@
+<config>
+    <model_path>best.pt</model_path>
+    <video_path></video_path>
+    <API_url>https://mdakk072.pythonanywhere.com</API_url>
+    <camera>false</camera>
+    <cameraid>1</cameraid>
+    <test>false</test>
+    <timeout>60</timeout>
+</config>
