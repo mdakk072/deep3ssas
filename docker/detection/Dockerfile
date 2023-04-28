@@ -13,5 +13,4 @@ COPY . .
 # Exposer le port 80 pour l'application Flask
 EXPOSE 80
 # Lancer l'application avec Gunicorn en mode production
-# Exécutez votre script de détection et votre application Flask en arrière-plan
 CMD gunicorn --bind 0.0.0.0:5000 app:app

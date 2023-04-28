@@ -11,7 +11,6 @@ except:
     sys.path.append('.')
     from modules.data_handler.azure_blob_storage import AzureBlobStorage
     import modules.data_handler.postgresql_handler as postgresql_handler
-    
 import xml.etree.ElementTree as ET
 
 def load_infos():
@@ -73,6 +72,7 @@ def get_credentials(filename='config.xml'):
         raise ValueError(f"Missing credentials: {', '.join(missing_vars)}")
 
     return credentials
+
 credentials=get_credentials()
 
 DB_HOST =                   credentials['DB_HOST']
@@ -99,11 +99,13 @@ def get_status():
     response = jsonify(infos)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
 @app.route('/test', methods=['GET'])
 def get_status2():
     response = jsonify([HOSTNAME])
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
 @app.route('/status', methods=['POST'])
 def update_status():
     global infos
