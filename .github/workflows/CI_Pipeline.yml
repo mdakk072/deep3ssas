@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - master
+
 jobs:
+
   test:
     runs-on: ubuntu-latest
     steps:
+
     - name: Check out repository
       uses: actions/checkout@v3
 
@@ -41,7 +44,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    
+
     - name: Check out repository
       uses: actions/checkout@v3
 
