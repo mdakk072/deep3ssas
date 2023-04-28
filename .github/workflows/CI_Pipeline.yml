@@ -1,12 +1,5 @@
 name: CI
 
-
-
-
-
-
-
-
 on:
   push:
     branches:
@@ -48,13 +41,13 @@ jobs:
     - name: Build and push Docker image for data_handler
       uses: docker/build-push-action@v2
       with:
-        context: ./modules/data_handler
+        context: ./docker/data_handler
         push: true
         tags: mdakk072/deep3ssasapi:latest
     - name: Build and push Docker image for web_app
       uses: docker/build-push-action@v2
       with:
-        context: ./modules/web_app
+        context: ./docker/web_app
         push: true
         tags: mdakk072/deep3ssasapp:latest
 
