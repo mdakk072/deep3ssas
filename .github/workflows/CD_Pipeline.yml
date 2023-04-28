@@ -24,3 +24,14 @@ jobs:
     - name: Run tests
       run: |
         pytest tests/
+      env:
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        APIHOSTNAME: ${{ secrets.APIHOSTNAME }}
+        AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+        CONTAINER_NAME_IMAGES: ${{ secrets.CONTAINER_NAME_IMAGES }}
+        CONTAINER_NAME_LABELS: ${{ secrets.CONTAINER_NAME_LABELS }}
+
