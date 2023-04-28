@@ -4,7 +4,12 @@ This project aims to create a parking spot detection and management system that 
 
 ## Overview
 
+
+
 1. **Python Flask Website**: A web application that displays available parking spots in different locations using Flask and Jinja2.
+
+
+
 
 2. **Detection Module**: 
 
