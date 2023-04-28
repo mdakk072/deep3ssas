@@ -54,6 +54,7 @@ def find_file(filename, default_path=None):
 def get_credentials(filename='config.xml'):
     env_vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'APIHOSTNAME', 'AZURE_CONNECTION_STRING', ]
     credentials = {var: os.environ.get(var) for var in env_vars}
+    print(credentials)
 
     config_file = find_file(filename)
     if config_file:
@@ -66,7 +67,8 @@ def get_credentials(filename='config.xml'):
                     credentials[var] = elem.text
                 else:
                     print(f"Warning: {var} not found in config.xml")
-
+    else:
+        print('No config file ! using env variables only')
     missing_vars = [var for var in env_vars if credentials[var] is None]
     if missing_vars:
         raise ValueError(f"Missing credentials: {', '.join(missing_vars)}")
@@ -74,7 +76,7 @@ def get_credentials(filename='config.xml'):
     return credentials
 
 credentials=get_credentials()
-
+print(credentials)
 DB_HOST =                   credentials['DB_HOST']
 DB_PORT =                   credentials['DB_PORT']
 DB_NAME =                   credentials['DB_NAME']
