@@ -1,10 +1,10 @@
-# Parking Spot Detection and Management System
+# **deep3ssas** : Parking Spot Detection and Management System
 
 This project aims to create a parking spot detection and management system that detects available parking spots and displays the information on a website. The system consists of a Python Flask website, a detection module using YOLOv5, and several other modules for data collection, correction, and model training and evaluation.
 
 ## Overview
 
-
+The project consists of several modules, each responsible for a specific task. The Detection Module is the core of the project and performs the detection of parking spots in real-time. The Data Handler module is responsible for managing the data, storing it in a PostgreSQL database, and uploading it to Azure Blob Storage. The Correction Module corrects the localization data of the detected parking spots. Finally, the Web App module provides a user interface that allows users to view the available parking spots on a map.
 
 1. **Python Flask Website**: 
 
@@ -192,13 +192,15 @@ To implement a DevOps approach for this project, we will use the following tools
 
 ## Tools Used So Far :
 
- - Git for version control and collaboration
- - Docker for containerization of the application and its dependencies
- - PostgreSQL for managing the application database
- - Azure Blob Storage for managing and storing the application data
- - Pytest for testing the application code
- - GitHub Actions for automating build and deployment processes
-
+ - ``Git`` for version control and collaboration
+ - ``Docker`` for containerization of the application and its dependencies
+ - ``PostgreSQL`` for managing the application database
+ - ``Azure Blob Storage`` for managing and storing the application data
+ - ``Pytest`` for testing the application code
+ - ``GitHub`` Actions for automating build and deployment processes
+- ``YAML`` for configuration files and for defining GitHub Actions workflows
+- ``XML`` for configuration files such as the data handler's config.xml file
+- ``JSON`` for data serialization, such as the parking_structure.json file in the detection module
 ## Methodologies:
  - Continuous Integration (CI) and Continuous Deployment (CD) to automate building, testing, and deploying the application to production
  - Agile software development methodology to continuously improve the application and adapt to changing requirements
