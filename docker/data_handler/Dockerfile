@@ -13,6 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copie les fichiers de l'application
 COPY ./modules/data_handler /app/modules/data_handler
 COPY ./static /app/modules/data_handler/static
+
+
 # Copie les fichiers à la racine du projet (sans les dossiers)
 COPY ./*.txt /app/
 COPY ./*.json /app/
