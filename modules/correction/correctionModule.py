@@ -16,6 +16,7 @@ class CorrectionModule:
         self.max_width = max_width
         self.max_height = max_height
     # BoxAnalysis methods
+ 
     def iou(self,box1,box2):
         x1, y1, a1, b1 = box1
         x2, y2, a2, b2 = box2
