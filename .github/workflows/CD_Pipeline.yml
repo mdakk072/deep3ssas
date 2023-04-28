@@ -1,18 +1,12 @@
 name: CD
-
 on:
   push:
-
     branches:
       - dev
       - feature/*
-
 jobs:
-
   test:
-
     runs-on: ubuntu-latest
- 
     steps:
 
     - name: Check out repository
