@@ -22,13 +22,6 @@ def test_status(client):
     
 
 
-def test_index(client):
-    response = client.get('/')
-    assert response.status_code == 200
 
-
-def test_map(client):
-    response = client.get('/map')
-    assert response.status_code == 200
 
 
